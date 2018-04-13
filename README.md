@@ -58,3 +58,19 @@ docker-compose down
 make build
 docker-compose up -d
 ```
+
+## Updating ssl certs
+
+Every 90 days we will have to update SSL certs. Here's how I did it (starting at the root of this repo).
+
+```shell
+docker-compose down
+rm secrets/jupyterhub.{key,crt}
+cd ../letsencrypt
+./letsencrypt-auto certonly --standalone -d DOMAIN.COM
+cd ../jupyterhub-deploy-docker
+sudo cp /etc/letsencrypt/live/DOMAIN.COM/fullchain.pem secrets/jupyterhub.crt
+sudo cp  /etc/letsencrypt/live/DOMAIN.COM/privkey.pem secrets/jupyterhub.key
+docker-compose build --no-cache
+docker-compose up -d
+```
